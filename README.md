@@ -45,6 +45,9 @@ Run `make help` for the full list.
 | `make infra-reset` | Stops infrastructure and deletes its volumes after typing `yes` (`FORCE=1` skips the prompt) |
 | `make infra-status` | Shows containers, health and memory usage |
 | `make infra-check` | Verifies the local stack, including database isolation |
+| `make core-up` | Builds and starts service containers (core profile) on top of infra, then seeds demo data |
+| `make core-down` | Stops service containers; infra keeps running |
+| `make core-check` | Verifies every service container reports gRPC health `SERVING` |
 | `make clean` | Removes dangling Docker images and build cache |
 
 ## Docker Desktop resources
