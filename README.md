@@ -47,7 +47,7 @@ Run `make help` for the full list.
 | `make infra-check` | Verifies the local stack, including database isolation |
 | `make core-up` | Builds and starts service containers (core profile) on top of infra, then seeds demo data |
 | `make core-down` | Stops service containers; infra keeps running |
-| `make core-check` | Verifies every service container reports gRPC health `SERVING` |
+| `make core-check` | Verifies every service container reports healthy (gRPC health for services, `/readyz` for the gateway) |
 | `make clean` | Removes dangling Docker images and build cache |
 
 ## Docker Desktop resources
