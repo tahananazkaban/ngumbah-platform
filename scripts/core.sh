@@ -1,11 +1,11 @@
 #!/bin/sh
-# Builds and runs service containers (core profile) on top of the infrastructure.
+# Builds and runs service containers (core profile) on top of the infrastructure; each image ships a health subcommand.
 set -eu
 # shellcheck source=lib.sh
 . "$(dirname "$0")/lib.sh"
 load_env
 
-core_services="tenant-svc"
+core_services="tenant-svc gateway"
 
 case "${1:-}" in
   up)
@@ -29,9 +29,9 @@ case "${1:-}" in
     failures=0
     for svc in $core_services; do
       if compose_all exec -T "$svc" "/$svc" health >/dev/null 2>&1; then
-        ok "$svc: grpc health is SERVING"
+        ok "$svc: healthy"
       else
-        fail "$svc: grpc health is not SERVING"
+        fail "$svc: not healthy"
         failures=$((failures + 1))
       fi
     done
