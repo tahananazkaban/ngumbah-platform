@@ -38,6 +38,11 @@ compose() {
   docker compose --project-directory "$PLATFORM_DIR" --profile infra "$@"
 }
 
+# Includes services that depend on infra, so stopping never leaves them orphaned
+compose_all() {
+  docker compose --project-directory "$PLATFORM_DIR" --profile infra --profile core "$@"
+}
+
 # Returns success when version $1 >= version $2 (dotted numbers only)
 version_ge() {
   awk -v a="$1" -v b="$2" 'BEGIN {

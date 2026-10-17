@@ -14,5 +14,5 @@ if [ "${FORCE:-0}" != 1 ]; then
   fi
 fi
 
-compose down --volumes --remove-orphans
+compose_all down --volumes --remove-orphans
 ok "infrastructure stopped and volumes deleted; run make infra-up for a clean start"

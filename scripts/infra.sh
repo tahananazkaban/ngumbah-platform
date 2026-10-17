@@ -12,13 +12,13 @@ case "${1:-}" in
     ok "infrastructure is up and healthy; run make infra-check to verify"
     ;;
   down)
-    compose down
+    compose_all down
     ok "infrastructure stopped, data kept"
     ;;
   status)
-    compose ps
+    compose_all ps
     echo
-    ids="$(compose ps --quiet)"
+    ids="$(compose_all ps --quiet)"
     if [ -n "$ids" ]; then
       # shellcheck disable=SC2086
       docker stats --no-stream --format 'table {{.Name}}\t{{.MemUsage}}\t{{.CPUPerc}}' $ids
