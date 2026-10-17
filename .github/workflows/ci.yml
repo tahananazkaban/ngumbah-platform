@@ -14,7 +14,7 @@ jobs:
       - name: Validate compose file
         run: |
           cp .env.example .env
-          docker compose --profile infra config --quiet
+          docker compose --profile infra --profile core config --quiet
 
       - name: ShellCheck
         run: docker run --rm -v "$PWD:/mnt" -w /mnt koalaman/shellcheck:v0.10.0 scripts/*.sh postgres/init/*.sh
