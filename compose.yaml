@@ -1,0 +1,64 @@
+name: ngumbah
+
+services:
+  floci:
+    image: floci/floci:2.3.0
+    profiles: [infra]
+    # Root is required to drive the host Docker socket for Lambda and RDS containers
+    user: root
+    ports:
+      - "${FLOCI_PORT:-4566}:4566"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - floci-data:/app/data
+    environment:
+      FLOCI_HOSTNAME: floci
+      FLOCI_STORAGE_MODE: hybrid
+      FLOCI_STORAGE_PERSISTENT_PATH: /app/data
+    healthcheck:
+      # Image ships a bash-only probe because it has no curl or wget
+      test: ["CMD", "/usr/local/bin/healthcheck.sh"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    mem_limit: 512m
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:17.11-alpine3.24
+    profiles: [infra]
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    # Passes NGUMBAH_SERVICES and per-service passwords to the init script
+    env_file: .env
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    mem_limit: 512m
+    restart: unless-stopped
+
+  valkey:
+    image: valkey/valkey:8.1.10-alpine3.24
+    profiles: [infra]
+    command: ["valkey-server", "--appendonly", "yes", "--maxmemory", "128mb", "--maxmemory-policy", "noeviction"]
+    ports:
+      - "${VALKEY_PORT:-6379}:6379"
+    volumes:
+      - valkey-data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    mem_limit: 192m
+    restart: unless-stopped
+
+volumes:
+  floci-data:
+  postgres-data:
+  valkey-data:
