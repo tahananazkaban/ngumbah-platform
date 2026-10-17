@@ -58,10 +58,26 @@ check "go" required 1.25 \
   "go env GOVERSION" \
   "brew install go" \
   "https://go.dev/doc/install"
-check "node" required 22.0 \
-  "node --version" \
-  "brew install node@22 (or nvm install 22)" \
-  "nvm install 22 (https://github.com/nvm-sh/nvm)"
+# Accept Node 22+ installed through nvm even when the shell default is older
+shell_node="$(first_version "$(node --version 2>/dev/null)")"
+nvm_node=""
+if [ -z "$shell_node" ] || ! version_ge "$shell_node" 22.0; then
+  for d in "${NVM_DIR:-$HOME/.nvm}"/versions/node/v*; do
+    [ -d "$d" ] || continue
+    v="${d##*/v}"
+    if version_ge "$v" 22.0 && { [ -z "$nvm_node" ] || version_ge "$v" "$nvm_node"; }; then
+      nvm_node="$v"
+    fi
+  done
+fi
+if [ -n "$nvm_node" ]; then
+  ok "node $nvm_node via nvm (shell default is ${shell_node:-none}; run 'nvm use 22' in Ngumbah repos)"
+else
+  check "node" required 22.0 \
+    "node --version" \
+    "nvm install 22 (https://github.com/nvm-sh/nvm)" \
+    "nvm install 22 (https://github.com/nvm-sh/nvm)"
+fi
 check "rustup" required 1.27 \
   "rustup --version" \
   "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh" \
