@@ -1,0 +1,6 @@
+# Repositories cloned by `make bootstrap`, one per line, next to ngumbah-platform.
+ngumbah-docs
+ngumbah-contracts
+ngumbah-tenant-svc
+ngumbah-gateway
+ngumbah-web
