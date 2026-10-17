@@ -58,6 +58,24 @@ services:
     mem_limit: 192m
     restart: unless-stopped
 
+  tenant-svc:
+    profiles: [core]
+    build:
+      context: ../ngumbah-tenant-svc
+    ports:
+      - "${TENANT_SVC_PORT:-50051}:50051"
+    environment:
+      TENANT_SVC_GRPC_ADDR: ":50051"
+      TENANT_SVC_DATABASE_URL: "postgres://tenant_svc:${TENANT_SVC_DB_PASSWORD}@postgres:5432/tenant_db?sslmode=disable"
+      # Development mode applies migrations on start and enables reflection
+      TENANT_SVC_ENV: development
+      TENANT_SVC_LOG_LEVEL: info
+    depends_on:
+      postgres:
+        condition: service_healthy
+    mem_limit: 128m
+    restart: unless-stopped
+
 volumes:
   floci-data:
   postgres-data:
