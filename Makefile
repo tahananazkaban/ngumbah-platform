@@ -2,7 +2,7 @@
 SHELL := /bin/sh
 .DEFAULT_GOAL := help
 
-.PHONY: help doctor bootstrap pull-all infra-up infra-down infra-reset infra-status infra-check clean
+.PHONY: help doctor bootstrap pull-all infra-up infra-down infra-reset infra-status infra-check core-up core-down core-check clean
 
 help: ## List available commands
 	@grep -E '^[a-zA-Z_-]+:.*## ' $(firstword $(MAKEFILE_LIST)) | \
@@ -31,6 +31,16 @@ infra-status: ## Show infrastructure containers, health and memory
 
 infra-check: ## Verify infrastructure health and database isolation
 	@sh scripts/infra-check.sh
+
+core-up: ## Build and start service containers on top of infra, then seed
+	@sh scripts/infra.sh up
+	@sh scripts/core.sh up
+
+core-down: ## Stop service containers, keep infrastructure running
+	@sh scripts/core.sh down
+
+core-check: ## Verify every service container reports gRPC health SERVING
+	@sh scripts/core.sh check
 
 clean: ## Remove dangling Docker images and build cache
 	@sh scripts/clean.sh
